@@ -1,0 +1,55 @@
+fn ackprefix_hasid(values: vector, key: f64) -> bool {
+    let mut i = 0;
+    while i < len(values) {
+        if at(values, i) == key {
+            return true;
+        }
+        i += 1;
+    }
+    false
+}
+
+fn ackprefix_finite(values: vector) -> bool {
+    let mut i = 0;
+    while i < len(values) {
+        let value = at(values, i);
+        if !(value - value == 0.0) {
+            return false;
+        }
+        i += 1;
+    }
+    true
+}
+
+fn ackprefix_counts(values: vector) -> bool {
+    let mut i = 0;
+    while i < len(values) {
+        let value = at(values, i);
+        if !(value >= 0.0 && value <= 9007199254740991.0 && value % 1.0 == 0.0) {
+            return false;
+        }
+        i += 1;
+    }
+    true
+}
+
+fn ackprefix_compute(acked: vector, start: f64) -> vector {
+    let mut next = start;
+    while ackprefix_hasid(acked, next) {
+        if next == 9007199254740991.0 {
+            return [];
+        }
+        next += 1.0;
+    }
+    [next, next - start]
+}
+
+// Find the longest contiguous acknowledgement prefix in unordered deliveries.
+// Returns [next unacknowledged offset, advanced count]. Duplicate acknowledgements never advance the cursor twice.
+pub fn ackprefix_advance(acked: vector, start: f64) -> vector {
+    if !ackprefix_counts(acked) { return []; }
+    if !(start >= 0.0 && start <= 9007199254740991.0 && start % 1.0 == 0.0) { return []; }
+    let result = ackprefix_compute(acked, start);
+    if !ackprefix_finite(result) { return []; }
+    result
+}
